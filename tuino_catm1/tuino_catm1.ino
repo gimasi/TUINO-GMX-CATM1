@@ -51,9 +51,9 @@ void setup() {
  /* for now we simply delay for 5 seconds */
 
   while((join_status = gmxCATM1_isNetworkJoined()) != CATM1_NETWORK_JOINED) {
-    gmxNB_Led2(GMXCATM1_LED_ON);
+    gmxCATM1_Led2(GMXCATM1_LED_ON);
     delay(500);
-    gmxNB_Led2(GMXCATM1_LED_OFF);
+    gmxCATM1_Led2(GMXCATM1_LED_OFF);
     Serial.print("Waiting to connect:");
     Serial.println(join_wait);
     join_wait++;
