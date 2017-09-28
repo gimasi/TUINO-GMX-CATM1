@@ -137,7 +137,7 @@ byte _parseResponse(String& response) {
   { 
     Serial.println("Matched OK!");
     ms.GetCapture (buf, 0);
-  
+
     response = String(buf);
      
     // remove second \r\n => Not very elegant to optimize
@@ -353,10 +353,10 @@ byte gmxCATM1_isNetworkJoined(void)
 
         tmp.toCharArray(cmd,tmp.length());
         
-        if (cmd[0] == '0'){
+        if (cmd[3] == '0'){
           return CATM1_NETWORK_NOT_JOINED;
         }
-        if (cmd[0] == '1'){
+        if (cmd[3] == '1'){
           return CATM1_NETWORK_JOINED;
         }
       }
