@@ -135,6 +135,7 @@ byte _parseResponse(String& response) {
   char result = ms.Match ("(.*)\r\nOK", 0);
   if ( result == REGEXP_MATCHED )
   { 
+    Serial.println("Matched OK!");
     ms.GetCapture (buf, 0);
   
     response = String(buf);
@@ -142,7 +143,8 @@ byte _parseResponse(String& response) {
     // remove second \r\n => Not very elegant to optimize
     response.toCharArray(cmd,response.length());
     response = String(cmd);
-     
+
+    Serial.println("RESPONSE=>"+response );
     return (GMXCATM1_OK);
   }
 
