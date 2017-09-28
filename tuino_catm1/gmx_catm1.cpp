@@ -304,6 +304,9 @@ void gmxCATM1_startSwisscom()
 
     _sendCmd("AT+QIACT=1\r");
     _parseResponse(dummyResponse);
+
+    _sendCmd("AT+CREG=2\r");
+    _parseResponse(dummyResponse);
 }
 
 
@@ -331,10 +334,15 @@ byte gmxCATM1_isNetworkJoined(void)
   char cmd[16];
   String tmp;
   
-   _sendCmd( "at+cgatt?\r" );
+   _sendCmd( "AT+CREG?\r" );
 
    if ( (status = _parseResponse(dummyResponse)) == GMXCATM1_OK ) 
   {
+
+    Serial.println("DEBUG AT+CREG");
+    Serial.println( dummyResponse );
+    Serial.println("END DEBUG***");
+    
 
       byte index = dummyResponse.indexOf(":");
       if ( index != -1 )

@@ -49,9 +49,7 @@ void setup() {
 
  /* Need to understand how we know we are joined to the network */
  /* for now we simply delay for 5 seconds */
-  delay(5000);  
- 
-/*
+
   while((join_status = gmxCATM1_isNetworkJoined()) != CATM1_NETWORK_JOINED) {
     gmxNB_Led2(GMXCATM1_LED_ON);
     delay(500);
@@ -62,7 +60,6 @@ void setup() {
     
     delay(2500);  
   }  
-*/
 
  
   Serial.println("Connected!!!");
