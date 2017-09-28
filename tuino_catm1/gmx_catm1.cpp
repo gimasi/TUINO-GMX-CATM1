@@ -73,11 +73,12 @@ void _sendCmd(String in) {
   int len = in.length();
   long int start_timeout;
 
+/*
  Serial.println("----->");
  Serial.print("SENDING: ");
  Serial.println(in);
  Serial.println("----->");
-
+*/
      
   //  send data
   for (int i=0; i<len; i++) {
@@ -124,11 +125,12 @@ byte _parseResponse(String& response) {
 
   gmxSerialString.toCharArray(cmd,gmxSerialString.length());
 
+/*
      Serial.println("<-----");
      Serial.print("RESPONSE: ");
      Serial.println(gmxSerialString);
      Serial.println("<-----");
-     
+  */   
      
   // Parse Response
   ms.Target(cmd);
@@ -144,11 +146,11 @@ byte _parseResponse(String& response) {
     {
       response = response.substring(index+2,response.length());
     }
-  /*
+  
     // remove second \r\n => Not very elegant to optimize
     response.toCharArray(cmd,response.length());
     response = String(cmd);
-    */
+  
     return (GMXCATM1_OK);
   }
 
@@ -165,11 +167,11 @@ byte _parseResponse(String& response) {
       response = response.substring(index+2,response.length());
     }
 
-     /*
+    
     // remove second \r\n => Not very elegant to optimize
     response.toCharArray(cmd,response.length());
     response = String(cmd);
-     */ 
+    
     return (GMXCATM1_OK);
   }
 
@@ -352,10 +354,11 @@ byte gmxCATM1_isNetworkJoined(void)
    if ( (status = _parseResponse(dummyResponse)) == GMXCATM1_OK ) 
   {
 
+/*
     Serial.println("DEBUG AT+CREG");
     Serial.println( dummyResponse );
     Serial.println("END DEBUG***");
-    
+ */   
 
       byte index = dummyResponse.indexOf(":");
       if ( index != -1 )

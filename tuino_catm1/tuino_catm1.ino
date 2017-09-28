@@ -40,7 +40,7 @@ void setup() {
   gmxCATM1_init("5.79.89.3","9200",NULL);
 
   gmxCATM1_getVersion(version);
-  Serial.print("GMX-CATM1 Version: "+version);
+  Serial.println("GMX-CATM1 Version: "+version);
 
   gmxCATM1_getIMEI(version);
   Serial.println("GMX-CATM1 IMEI: "+version);
