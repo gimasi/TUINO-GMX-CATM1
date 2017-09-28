@@ -132,19 +132,23 @@ byte _parseResponse(String& response) {
      
   // Parse Response
   ms.Target(cmd);
+
   char result = ms.Match ("(.*)\r\nOK", 0);
   if ( result == REGEXP_MATCHED )
   { 
-    Serial.println("Matched OK!");
     ms.GetCapture (buf, 0);
-
     response = String(buf);
-     
+    
+    byte index = response.indexOf("\r\n");
+    if ( index != -1 )
+    {
+      response = response.substring(index+2,response.length());
+    }
+  /*
     // remove second \r\n => Not very elegant to optimize
     response.toCharArray(cmd,response.length());
     response = String(cmd);
-
-    Serial.println("RESPONSE=>"+response );
+    */
     return (GMXCATM1_OK);
   }
 
@@ -154,11 +158,18 @@ byte _parseResponse(String& response) {
     ms.GetCapture (buf, 0);
   
     response = String(buf);
-     
+
+    byte index = response.indexOf("\r\n");
+    if ( index != -1 )
+    {
+      response = response.substring(index+2,response.length());
+    }
+
+     /*
     // remove second \r\n => Not very elegant to optimize
     response.toCharArray(cmd,response.length());
     response = String(cmd);
-     
+     */ 
     return (GMXCATM1_OK);
   }
 
