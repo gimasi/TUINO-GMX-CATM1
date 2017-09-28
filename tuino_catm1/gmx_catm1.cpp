@@ -143,17 +143,32 @@ byte _parseResponse(String& response) {
     response.toCharArray(cmd,response.length());
     response = String(cmd);
      
-    return (GMXNB_OK);
+    return (GMXCATM1_OK);
   }
+
+  result = ms.Match ("(.*)\r\nSEND OK", 0);
+  if ( result == REGEXP_MATCHED )
+  { 
+    ms.GetCapture (buf, 0);
+  
+    response = String(buf);
+     
+    // remove second \r\n => Not very elegant to optimize
+    response.toCharArray(cmd,response.length());
+    response = String(cmd);
+     
+    return (GMXCATM1_OK);
+  }
+
 
   // Check for Errors
   result = ms.Match ("(.*)\r\nERROR", 0);
   if ( result == REGEXP_MATCHED )
   {
-    return(GMXNB_AT_ERROR);
+    return(GMXCATM1_AT_ERROR);
   }
     
-  return(GMXNB_AT_GENERIC_ERROR);
+  return(GMXCATM1_AT_GENERIC_ERROR);
 }
 
 
@@ -262,7 +277,7 @@ byte gmxCATM1_getVersion(String& version)
 /* IMEI */
 byte gmxCATM1_getIMEI(String& imei)
 {
-   _sendCmd( "AT+CGSN=1\r" );
+   _sendCmd( "AT+CGSN\r" );
    return( _parseResponse(imei) );
 }
 
@@ -275,44 +290,37 @@ byte gmxCATM1_getCSQ(String& csq)
 
 void gmxCATM1_startSwisscom() 
 {
-    _sendCmd( "AT+NCONFIG=CR_0354_0338_SCRAMBLING,TRUE\r" );
+
+    // activate CAT-M1
+    _sendCmd("AT+QCFG=\"nwscanseq\",02,1\r");
     _parseResponse(dummyResponse);
-   
-   _sendCmd( "AT+NCONFIG=CR_0859_SI_AVOID,TRUE\r" );
-   _parseResponse(dummyResponse);
-   
-   _sendCmd( "AT+CFUN=0\r" );
-   _parseResponse(dummyResponse);
 
-   _sendCmd( "AT+CGDCONT=1,\"IP\",\"internet.nbiot.telekom.de.MNC040.MCC901.GPRS\"\r" );
-   _parseResponse(dummyResponse);
-   
-   _sendCmd( "AT+CFUN=1\r" );
-   _parseResponse(dummyResponse);
+    _sendCmd("AT+QCFG=\"iotopmode\",0,1\r");
+    _parseResponse(dummyResponse);
 
-   _sendCmd( "AT+NBAND=8\r" );
-   _parseResponse(dummyResponse);
-  
-   _sendCmd( "AT+COPS=1,2,\"26201\"\r" );
-   _parseResponse(dummyResponse);
- 
+
+    _sendCmd("AT+QICSGP=1,1,\"gprs.swisscom.ch\",\"\",\"\",1\r");
+    _parseResponse(dummyResponse);
+
+    _sendCmd("AT+QIACT=1\r");
+    _parseResponse(dummyResponse);
 }
 
-/* Radio */
-byte gmxCATM1_radioON(String& param)
+
+/* Utility */
+
+byte gmxCATM1_getIpAddress(String& ipaddress)
 {
-   _sendCmd( "AT+CFUN=1\r" );
-   return( _parseResponse(param) );
+ _sendCmd("AT+QIACT?\r");
+ return( _parseResponse(ipaddress) );
 }
 
-
-/* APN */
-
-byte gmxCATM1_setAPN(String APN)
+byte gmxCATM1_getNetworkInfo(String& nwinfo)
 {
-   _sendCmd( "at+cgdcont=1,\"IP\",\""+APN+"\"\r" );
-   return( _parseResponse(dummyResponse) );
+ _sendCmd("AT+QNWINFO\r");
+ return( _parseResponse(nwinfo) );
 }
+
 
 
 /* Check Network */
@@ -325,7 +333,7 @@ byte gmxCATM1_isNetworkJoined(void)
   
    _sendCmd( "at+cgatt?\r" );
 
-   if ( (status = _parseResponse(dummyResponse)) == GMXNB_OK ) 
+   if ( (status = _parseResponse(dummyResponse)) == GMXCATM1_OK ) 
   {
 
       byte index = dummyResponse.indexOf(":");
@@ -336,10 +344,10 @@ byte gmxCATM1_isNetworkJoined(void)
         tmp.toCharArray(cmd,tmp.length());
         
         if (cmd[0] == '0'){
-          return NB_NETWORK_NOT_JOINED;
+          return CATM1_NETWORK_NOT_JOINED;
         }
         if (cmd[0] == '1'){
-          return NB_NETWORK_JOINED;
+          return CATM1_NETWORK_JOINED;
         }
       }
       
@@ -353,45 +361,44 @@ byte gmxCATM1_isNetworkJoined(void)
 
 // TX & RX Data
 
-byte gmxCATM1_TXData(String data) {
+byte gmxCATM1_TXData(char *data) 
+{
 
-  int num_bytes;
+  char c;
 
-   num_bytes = data.length()/2;
-   
-   _sendCmd("at+nsocr=DGRAM,17,"+_udp_port+"\r");
+   _sendCmd("AT+QIOPEN=1,0,\"UDP\",\"5.79.89.3\",9200,0,1\r");
    _parseResponse(dummyResponse);
  
-   _sendCmd("at+nsost=0,"+_upd_socket_ip+","+_upd_port+","+String(num_bytes)+","+data+"\r" ); 
-   _parseResponse(dummyResponse);
-   _sendCmd("at+nsocl=0\r");
-   return( _parseResponse(dummyResponse) );
-  
-}
+   _sendCmd("AT+QISEND=0\r");
 
-
-byte gmxCATM1_RXData(String& data, int *port)
-{
-  byte status;
-  String str1,str2;
-  
-    // need a delay because the interrupt arrives too fast
-    delay(100);
-   _sendCmd( "AT+RECVB=?\r" );
-   status = _parseResponse(dummyResponse);
-
-   if (status == GMXNB_OK )
-   {
-      byte index = dummyResponse.indexOf(":");
-      if ( index != -1 )
+   // Wait for > char
+   while (Serial1.available()>0) 
+   { 
+      while ( c != '>')
       {
-        str1 = dummyResponse.substring(0,index);
-        str2 = dummyResponse.substring(index+1,dummyResponse.length());
-        data = String(str2);
-        *port = str1.toInt();
-      }   
+        c = Serial1.read();   
+      }
    }
+
+  int len = sizeof(data);
+     
+  //  send data
+  for (int i=0; i<len; i++) 
+  {
+    Serial1.write(data[i]);
+    delay(1);
+  }
+
+  // Send CTRL-Z
+  Serial1.write(0x26);
+  _parseResponse(dummyResponse);
+
+  _sendCmd("AT+QICLOSE=0\r");
+
+  return( _parseResponse(dummyResponse) );
+  
 }
+
 
 
 void gmxCATM1_Reset(void){

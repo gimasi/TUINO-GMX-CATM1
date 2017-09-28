@@ -45,36 +45,34 @@
 #define CATM1_NETWORK_NOT_JOINED         0
  
 
-byte gmxCATM1_init(void (*function)());
+byte gmxCATM1_init(String upd_addre, String udp_port,void (*function)());
 byte gmxCATM1_getVersion(String& version);
 byte gmxCATM1_getIMEI(String& imei);
 
-byte gmxCATM1_radioON(String& param);
-byte gmxCATM1_setAPN(String APN);
 byte gmxCATM1_isNetworkJoined(void);
 
 byte gmxCATM1_getCSQ(String& csq);
 
+byte gmxCATM1_getIpAddress(String& ipaddress);
+byte gmxCATM1_getNetworkInfo(String& nwinfo);
 
 void gmxCATM1_startSwisscom();
 
 
 // TX & RX Data
-byte gmxNB_TXData(String data);
-byte gmxNB_RXData(String& data);
-
+byte gmxCATM1_TXData(char *data);
 
 
 /*
  * Utilities
  */
  
-byte gmxNB_Led1(byte led_state);
-byte gmxNB_Led2(byte led_state);
-byte gmxNB_Led3(byte led_state);
+byte gmxCATM1_Led1(byte led_state);
+byte gmxCATM1_Led2(byte led_state);
+byte gmxCATM1_Led3(byte led_state);
 
-void gmxNB_Reset(void);
-void gmxNB_StringToHex(String string, char *data, int *len );
+void gmxCATM1_Reset(void);
+void gmxCATM1_StringToHex(String string, char *data, int *len );
 
 
 
