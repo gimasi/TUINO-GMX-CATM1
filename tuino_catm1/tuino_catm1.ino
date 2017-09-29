@@ -28,7 +28,7 @@ long int timer_millis_tx = 0;
 
 void setup() {
 
-  String version;
+  String version,imsi;
   byte join_status;
   int join_wait=0;
 
@@ -45,12 +45,15 @@ void setup() {
   gmxCATM1_getIMEI(version);
   Serial.println("GMX-CATM1 IMEI: "+version);
 
+  gmxCATM1_getIMSI(imsi);
+  Serial.println("IMSI: "+imsi);
+    
   gmxCATM1_startSwisscom(); 
 
  /* Need to understand how we know we are joined to the network */
  /* for now we simply delay for 5 seconds */
 
-  while((join_status = gmxCATM1_isNetworkJoined()) != CATM1_NETWORK_JOINED) {
+  while((join_status = gmxCATM1_isNetworkAttached()) != CATM1_NETWORK_ATTACHED) {
     gmxCATM1_Led2(GMXCATM1_LED_ON);
     delay(500);
     gmxCATM1_Led2(GMXCATM1_LED_OFF);
@@ -62,7 +65,7 @@ void setup() {
   }  
 
  
-  Serial.println("Connected!!!");
+  Serial.println("Attached!!!");
   gmxCATM1_Led2(GMXCATM1_LED_ON);
 }
 

@@ -296,6 +296,12 @@ byte gmxCATM1_getIMEI(String& imei)
    return( _parseResponse(imei) );
 }
 
+/* IMSI */
+byte gmxCATM1_getIMSI(String& imsi)
+{
+   _sendCmd( "AT+CIMI\r" );
+   return( _parseResponse(imsi) );
+}
 
 byte gmxCATM1_getCSQ(String& csq)
 {
@@ -343,7 +349,7 @@ byte gmxCATM1_getNetworkInfo(String& nwinfo)
 
 /* Check Network */
 
-byte gmxCATM1_isNetworkJoined(void)
+byte gmxCATM1_isNetworkAttached(void)
 {
   byte status;
   char cmd[16];
@@ -368,10 +374,10 @@ byte gmxCATM1_isNetworkJoined(void)
         tmp.toCharArray(cmd,tmp.length());
         
         if (cmd[3] == '0'){
-          return CATM1_NETWORK_NOT_JOINED;
+          return CATM1_NETWORK_NOT_ATTACHED;
         }
         if (cmd[3] == '1'){
-          return CATM1_NETWORK_JOINED;
+          return CATM1_NETWORK_ATTACHED;
         }
       }
       

@@ -41,15 +41,16 @@
 #define GMX_BOOT_DELAY                4000
 
 
-#define CATM1_NETWORK_JOINED             1
-#define CATM1_NETWORK_NOT_JOINED         0
+#define CATM1_NETWORK_ATTACHED         1
+#define CATM1_NETWORK_NOT_ATTACHED     0
  
 
 byte gmxCATM1_init(String upd_addre, String udp_port,void (*function)());
 byte gmxCATM1_getVersion(String& version);
 byte gmxCATM1_getIMEI(String& imei);
+byte gmxCATM1_getIMSI(String& imsi);
 
-byte gmxCATM1_isNetworkJoined(void);
+byte gmxCATM1_isNetworkAttached(void);
 
 byte gmxCATM1_getCSQ(String& csq);
 
